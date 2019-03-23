@@ -1,12 +1,12 @@
 #!/usr/bin/python3.5
 
-from functools import reduce
+import datetime
 import socket
-import datetime, time
-
+import time
+from functools import reduce
 
 HOST = '192.168.0.178'  # The NFC reader IP address
-PORT = 4001        # Port where reader listens
+PORT = 4001  # Port where reader listens
 
 header_id = 0xA0
 
@@ -49,31 +49,34 @@ cmd_name_reset_inventory_buffer = 0x93
 cmd_name_set_buffer_data_frame_interval = 0x94
 cmd_name_get_buffer_data_frame_interval = 0x95
 
-def checkSum(b):
-    moduloSum = reduce((lambda x, y: (x + y)),b)
-    return (~moduloSum+1) % 256
 
-def packData(address,bytedata):
+def checkSum(b):
+    moduloSum = reduce((lambda x, y: (x + y)), b)
+    return (~moduloSum + 1) % 256
+
+
+def packData(address, bytedata):
     header_len = 2
-    p = bytearray([header_id,len(bytedata)+header_len,address]) +bytedata
+    p = bytearray([header_id, len(bytedata) + header_len, address]) + bytedata
     p += bytearray([checkSum(p)])
     return p
 
-##====================================
-## Packet Construction
-##====================================
 
-def createRealTimeInventoryPacket(address=1,channel=1):
-    return packData(address,bytearray([cmd_name_real_time_inventory,channel]))
+def createRealTimeInventoryPacket(address=1, channel=1):
+    return packData(address, bytearray([cmd_name_real_time_inventory, channel]))
 
-def createBufferedInventoryPacket(address=1,channel=1):
-    return packData(address,bytearray([cmd_name_inventory,channel]))
+
+def createBufferedInventoryPacket(address=1, channel=1):
+    return packData(address, bytearray([cmd_name_inventory, channel]))
+
 
 def createGetAndResetInventoryBufferPacket(address=1):
-    return packData(address,bytearray([cmd_name_get_and_reset_inventory_buffer]))
+    return packData(address, bytearray([cmd_name_get_and_reset_inventory_buffer]))
 
-def createSetAntennaPacket(antenna_id,address=1):
-    return packData(address,bytearray([cmd_name_set_work_antenna,antenna_id]))
+
+def createSetAntennaPacket(antenna_id, address=1):
+    return packData(address, bytearray([cmd_name_set_work_antenna, antenna_id]))
+
 
 # Create a new socket to handle conversation with yr903
 
@@ -81,10 +84,11 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.settimeout(5)
 s.connect((HOST, PORT))
 while 1:
-   s.send(createSetAntennaPacket(1,1))
-   s.send(createRealTimeInventoryPacket())
-   data = s.recv(8000)
-   timestamp =  datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-   screen_output = str(timestamp) + " " + data.hex()
-   print (screen_output)
+    s.send(createSetAntenna(1, 1))
+    s.send(createRealTimeInyPacket())
+    data = s.recv(8000)
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    screen_output = str(timestamp) + " " + data.hex()
+    print(screen_output)
+
 s.close()
