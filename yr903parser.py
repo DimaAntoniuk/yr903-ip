@@ -1,12 +1,17 @@
 #!/usr/bin/python3.5
 
+#designed by dante
+
 import datetime
 import socket
 import time
 from functools import reduce
+import paho.mqtt.client as mqtt
 
 HOST = '192.168.0.178'  # The NFC reader IP address
 PORT = 4001  # Port where reader listens
+CHECKPOINT_ID = input(); #code to identify current checkpoint
+brocker = "192.168.0.1"
 
 header_id = 0xA0
 
@@ -78,18 +83,34 @@ def createSetAntennaPacket(antenna_id, address=1):
     return packData(address, bytearray([cmd_name_set_work_antenna, antenna_id]))
 
 
+# def on_connect(client, userdata, rc):
+#     print("connected with exit code: " + str(rc))
+#     client.subscribe(brocker)
+
+def on_massage(client, userdata, massage):
+    print("recived amssage = " + " " + str(massage.payload.decode("utf-8"))
+
+
+
 # Create a new socket to handle conversation with yr903
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.settimeout(5)
-s.connect((HOST, PORT))
-while 1:
-    s.send(createSetAntenna(1, 1))
-    s.send(createRealTimeInyPacket())
-    data = s.recv(8000)
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    screen_output = str(timestamp) + " " + data.hex()
-    print(screen_output)
-    
+tags = ["e280116060000206699a8abe4879", "e20000158508017719404ca149c8",
+"e2005186060a0152267009d83e8a", "e20000175608012611909f4d472d"]
 
-s.close()
+myFile = open("myFile.txt", "w+")
+
+client = mqtt.Client("client-01");
+#client.on_massage = on_massage
+client.connect(brocker)
+
+
+#s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#s.settimeout(5)
+#s.connect((HOST, PORT))
+for tag in tags:
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    screen_output = CHECKPOINT_ID + " " + tag + " " + str(timestamp)
+    myFile.write(screen_output + '\n')
+    client.publish("myTopic", "my massage")
+
+#s.close()
