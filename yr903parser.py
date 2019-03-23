@@ -90,5 +90,6 @@ while 1:
     timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     screen_output = str(timestamp) + " " + data.hex()
     print(screen_output)
+    
 
 s.close()
