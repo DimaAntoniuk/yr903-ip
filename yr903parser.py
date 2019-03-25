@@ -11,7 +11,7 @@ import paho.mqtt.client as mqtt
 HOST = '192.168.0.178'  # The NFC reader IP address
 PORT = 4001  # Port where reader listens
 CHECKPOINT_ID = input(); #code to identify current checkpoint
-brocker = "m16.cloudmqtt.com"
+brocker = "127.0.0.1"
 
 header_id = 0xA0
 
@@ -99,8 +99,8 @@ tags = ["e280116060000206699a8abe4879", "e20000158508017719404ca149c8",
 client = mqtt.Client("client-01");
 client.on_connect = on_connect
 client.on_massage = on_massage
-client.connect(brocker, 13086)
-client.username_pw_set("aizylcpj", "OmekZuyH__Sh")
+client.connect(brocker)
+#client.username_pw_set("aizylcpj", "OmekZuyH__Sh")
 
 client.loop_start()
 for tag in tags:
