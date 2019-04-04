@@ -96,20 +96,31 @@ def on_publish(client,userdata,result):
 
 # Create a new socket to handle conversation with yr903
 
-tags = ["e280116060000206699a8abe4879", "e20000158508017719404ca149c8",
-"e2005186060a0152267009d83e8a", "e20000175608012611909f4d472d"]
+#tags = ["e280116060000206699a8abe4879", "e20000158508017719404ca149c8",
+#"e2005186060a0152267009d83e8a", "e20000175608012611909f4d472d"]
+myFile = open("myFile.txt", "w+")
 
-client = mqtt.Client("client-01");
-client.on_connect = on_connect
-client.on_massage = on_massage
-client.on_publish = on_publish
-client.connect(brocker, MQTT_PORT)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.settimeout(5)
+s.connect((HOST, READER_PORT))
 
-client.loop_start()
-for tag in tags:
+# client = mqtt.Client("client-01");
+# client.on_connect = on_connect
+# client.on_massage = on_massage
+# client.on_publish = on_publish
+# client.connect(brocker, MQTT_PORT)
+#
+# client.loop_start()
+
+while 1:
+    s.send(createSetAntennaPacket(1,1))
+    s.send(createRealTimeInventoryPacket())
+    data = s.recv(8000)
     timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    screen_output = str(CHECKPOINT_ID) + " " + tag + " " + str(timestamp)
-    client.publish("myTopic", screen_output)
+    screen_output = str(CHECKPOINT_ID) + " " + data.hex() + " " + str(timestamp)
+    myFile.write(screen_output + "\n")
+    #client.publish("myTopic", screen_output)
 
-client.loop_stop()
-client.disconnect()
+# client.loop_stop()
+# client.disconnect()
+s.close()
