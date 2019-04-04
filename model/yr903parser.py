@@ -9,7 +9,8 @@ from functools import reduce
 import paho.mqtt.client as mqtt
 
 HOST = '192.168.0.178'  # The NFC reader IP address
-PORT = 4001  # Port where reader listens
+READER_PORT = 4001  # Port where reader listens
+MQTT_PORT = 1883  #Port where mosquitto listens
 CHECKPOINT_ID = input(); #code to identify current checkpoint
 brocker = "127.0.0.1"
 
@@ -90,6 +91,8 @@ def on_connect(client, userdata, rc):
 def on_massage(client, userdata, massage):
      print(str(massage.payload))
 
+def on_publish(client,userdata,result):
+    print("data published \n")
 
 # Create a new socket to handle conversation with yr903
 
@@ -99,14 +102,13 @@ tags = ["e280116060000206699a8abe4879", "e20000158508017719404ca149c8",
 client = mqtt.Client("client-01");
 client.on_connect = on_connect
 client.on_massage = on_massage
-client.connect(brocker)
-#client.username_pw_set("aizylcpj", "OmekZuyH__Sh")
+client.on_publish = on_publish
+client.connect(brocker, MQTT_PORT)
 
 client.loop_start()
 for tag in tags:
     timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-    screen_output = CHECKPOINT_ID + " " + tag + " " + str(timestamp)
-    myFile.write(screen_output + '\n')
+    screen_output = str(CHECKPOINT_ID) + " " + tag + " " + str(timestamp)
     client.publish("myTopic", screen_output)
 
 client.loop_stop()
