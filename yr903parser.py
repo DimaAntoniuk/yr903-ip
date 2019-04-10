@@ -11,7 +11,6 @@ import paho.mqtt.client as mqtt
 HOST = '192.168.0.178'  # The NFC reader IP address
 READER_PORT = 4001  # Port where reader listens
 MQTT_PORT = 1883  #Port where mosquitto listens
-CHECKPOINT_ID = input(); #code to identify current checkpoint
 brocker = "127.0.0.1"
 
 header_id = 0xA0
@@ -97,6 +96,8 @@ def on_publish(client,userdata,result):
 # Create a new socket to handle conversation with yr903
 
 myFile = open("myFile.txt", "w+")
+checkpointId = open("checkpointId.txt")
+CHECKPOINT_ID = checkpointId.readline(); #code to identify current checkpoint
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.settimeout(5)

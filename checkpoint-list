@@ -1,2 +1,2 @@
 CHECKPOINT_ID FORMAT:
-0(up to 3)number(3)_(up to ten in location name)location name(up to ten)
+n0, n-[1-10]
